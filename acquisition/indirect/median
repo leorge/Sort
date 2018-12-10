@@ -25,7 +25,7 @@ fi
 
 exit
 
-# mixed in FX8300.ods
+# median in FX8300.ods
 
 $ opt=256 performance $0 23 10
 
