@@ -1,3 +1,3 @@
 # Sort
 
-Sorting algorithm
+Eclipse CDT project for sorting algorithms.
