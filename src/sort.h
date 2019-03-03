@@ -74,8 +74,7 @@ void    quick_hole      (void *base, size_t nmemb, size_t size, int (*compare)(c
 void    quick_pivot     (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
 void    quick_random    (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
 void    quick_secure    (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
-void    stable_array    (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
-void    udi_qsort       (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
+void    ticket_sort     (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
 
 // indirect sorting
 void    imsort          (void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
@@ -93,7 +92,6 @@ void    insert_linear   (void *base[], size_t nmemb, int (*compare)(const void *
 void    qsort3_indr     (void *base[], size_t nmemb, int (*compare)(const void *, const void *));
 void    rabbit_sort     (void *base[], size_t nmemb, int (*compare)(const void *, const void *));
 void    shell_sort      (void *base[], size_t nmemb, int (*compare)(const void *, const void *));
-void    stable_pointer  (void *base[], size_t nmemb, int (*compare)(const void *, const void *));
 
 // search pivot
 void    *median_of_5(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
@@ -105,21 +103,21 @@ void    *get_buffer();
 void    free_buffer();
 
 // timer
-void start_timer();
-long stop_timer();
+void    start_timer();
+long    stop_timer();
 
 // others
-void    **edit_index(void **rtn, void *array1d, size_t nmemb, size_t size);
-void    **make_index(void *array1d, size_t nmemb, size_t size);
+void    **edit_index(void **rtn, char *array1d, size_t nmemb, size_t size);
+void    **make_index(char *array1d, size_t nmemb, size_t size);
 void    set_gaps();
 void    unindex(void *array1d, void *idxtbl[], size_t nmemb, size_t size);
 
 // for debug
 const char  *dump_data(const void *data);
 const char  *dump_size_t(char *buf, size_t val);
-void        dump_copy(void *dst, const void *src);
-void        dump_array(const char *msg, const void *head, size_t left, size_t middle, size_t right, size_t size);
-void        dump_pointer(char *msg, void *head[], size_t length);
-void        dump_rate(size_t anterior, size_t posterior);
+void    dump_copy(void *dst, const void *src);
+void    dump_array(const char *msg, const void *head, size_t left, size_t middle, size_t right, size_t size);
+void    dump_pointer(char *msg, void *head[], size_t length);
+void    dump_rate(size_t anterior, size_t posterior);
 
 #endif /* SORT_H_ */
