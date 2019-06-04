@@ -2,9 +2,9 @@
 #
 # Usage:
 #
-#   N=nnn; random.awk $N | ./$0 [-N $N] [-Z 999] ...
+#   N=nnn; random.awk $N | [dir=Debug] ./$0 [-N $N] [-Z 999] ...
 #
-Debug/Sort -fdK3wjhSarqkm \
+${dir:=Release}/Sort -UfdK3wjhSarqkm \
     -t -P 31,63,127,255,1023,4095 \
     -I qm -B 8191 \
     -R 1 \
