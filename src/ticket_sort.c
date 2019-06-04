@@ -1,7 +1,7 @@
 /*
- * ticket_sort.c
+ * ticket_qsort.c
  *
- *  Indirect asymmetric quicksort with User-Defined Index
+ *  Ticket sort using asymmetric quicksort
  *  to make the time complexity to O(n log(n)) when the element size is large.
  *
  *  Sorting key is the first member of an array element up to 16 bytes.
@@ -14,11 +14,9 @@
 
 typedef struct {
     void    *key1, *key2, *body;
-    size_t  position;
 } TICKET;
 
 static size_t   length;
-
 static void copy(void *dst, const void *src)
 {
     assert(dst != src);
@@ -26,18 +24,22 @@ static void copy(void *dst, const void *src)
 }
 
 static int (*comp)(const void *, const void *);
-
 static int my_comp(const void *p1, const void *p2) {
     int rtn = comp(p1, p2);
-    if (! rtn) {
 #ifdef DEBUG
-        const TICKET    *t1 = p1, *t2 = p2;
-        char buf1[16], buf2[16];
-        if (trace_level >= TRACE_DUMP) fprintf(OUT, "my_comp() %s , %s \"%s\"\n"
-            , dump_size_t(buf1, t1->position), dump_size_t(buf2, t2->position), (char *)&t1->key1);
+    const TICKET    *t1 = p1, *t2 = p2;
+    if (trace_level >= TRACE_DUMP) fprintf(OUT, "my_comp(\"%s\", \"%s\")"
+        , (char *)&t1->key1, (char *)&t2->key1);
 #endif
-        rtn = ((TICKET *)p1)->position - ((TICKET *)p2)->position;
+    if ((rtn == 0)) {
+#ifdef DEBUG
+        if (trace_level >= TRACE_DUMP) fprintf(OUT, "at %p and %p", t1->body, t2->body);
+#endif
+        rtn = (((TICKET *)p1)->body> ((TICKET *)p2)->body) ? 1 : -1;
     }
+#ifdef DEBUG
+    if (trace_level >= TRACE_DUMP) fprintf(OUT, " --> %d\n", rtn);
+#endif
     return  rtn;
 }
 
@@ -61,11 +63,10 @@ void ticket_sort(void *base, size_t nmemb, size_t size, int (*compare)(const voi
 #endif
         comp = compare;
         char    save[length = size], *body = base;
-        for (size_t i = 0; i < nmemb; i++) {	// Make an index.
-            tic->body = body;					// Point an array element.
-            tic->key1 = ((TICKET *)body)->key1;	// Copy the first 8 bytes.
-            tic->key2 = ((TICKET *)body)->key2;	// Copy the next 8 bytes.
-            tic->position = i;                 		// record number (zero origin)
+        for (size_t i = 0; i < nmemb; i++) {    // Make an index.
+            tic->body = body;                   // Point an array element.
+            tic->key1 = ((TICKET *)body)->key1; // Copy the first 8 bytes.
+            tic->key2 = ((TICKET *)body)->key2; // Copy the next 8 bytes.
             tic++; body += size;
         }
         asymm_qsort(tickets, nmemb, sizeof(TICKET), my_comp); // Sort the index
@@ -78,7 +79,7 @@ void ticket_sort(void *base, size_t nmemb, size_t size, int (*compare)(const voi
         }
 #endif
         // reorder array elements
-        TICKET	*t;
+        TICKET  *t;
         void    *src = base, *dst;
         tic = tickets; body = base;
         for (size_t i = 0; i < nmemb; i++) {
@@ -97,7 +98,7 @@ void ticket_sort(void *base, size_t nmemb, size_t size, int (*compare)(const voi
 #endif
                     t->body = dst;              // reset the address
                     t = &tickets[((dst = src) - base) / size];   // points the new hole
-                } while (t->body != body);		// cyclic permutation
+                } while (t->body != body);      // cyclic permutation
                 copy((t->body = src), save); // restore saved element
 #ifdef DEBUG
                 if (trace_level >= TRACE_MOVE) fprintf(OUT, "restore \"%s\" into array[%s]\n"
