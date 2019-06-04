@@ -89,7 +89,6 @@ static  void dump_buffer(void *array, size_t nmemb, size_t size) {
 
 typedef enum {
     DEBUG_SORT,
-    DUMMY_SORT,
     SWAP_FIRST,
     SWAP_MIDDLE,
     SWAP_KR,
@@ -105,6 +104,7 @@ typedef enum {
     TICKET_SORT,
     MERGE_INDIRECT,
     MERGE_ARRAY,
+    DUMMY_SORT		// The last enumeration
 } SORT_TYPE;
 
 typedef struct {
@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
         fprintf(ERR, "The first line is empty.\n");
         return EXIT_FAILURE;
     } else if (size == 0) { // -Z is undefined.
-        size = data_len;
+        size = data_len + 1;
     } else if (data_len > size) {
         fprintf(ERR, "The first line is too long! Use the -Z option.\n");
         return EXIT_FAILURE;
