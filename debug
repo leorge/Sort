@@ -2,7 +2,7 @@
 #
 # Usage:
 #
-#   N=nnn; random.awk $N | ./$0 -N $N -Z 999
+#   N=nnn; random.awk $N | ./$0 [-N $N] [-Z 999] ...
 #
 Debug/Sort -fdK3wjhSarqkm \
     -t -P 31,63,127,255,1023,4095 \
