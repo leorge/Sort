@@ -21,7 +21,7 @@ static void copy(void *dst, const void *src, size_t n)
 #ifdef  DEBUG
     else {
         if (trace_level >= TRACE_MOVE) fprintf(OUT,
-        	"Copy(dst == src : %p, size = %s)\n", dst, dump_size_t(NULL, n));
+            "Copy(dst == src : %p, size = %s)\n", dst, dump_size_t(NULL, n));
         exit(-1);
     }
 #endif
@@ -37,7 +37,7 @@ void **edit_index(void **rtn, char *array1d, size_t nmemb, size_t size) {
 #ifdef DEBUG
     char    msg[300];
     if (trace_level >= TRACE_DUMP) {
-    	sprintf(msg, "edit_index(%p) at %p", array1d, rtn);
+        sprintf(msg, "edit_index(%p) at %p", array1d, rtn);
         dump_pointer(msg, rtn, nmemb);
     }
 #endif
