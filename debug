@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Usage:
+#
+#   N=nnn; random.awk $N | ./$0 -N $N -Z 999
+#
+Debug/Sort -fdK3wjhSarqkm \
+    -t -P 31,63,127,255,1023,4095 \
+    -I qm -B 8191 \
+    -R 1 \
+    $*	# You can add parameters
