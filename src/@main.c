@@ -59,6 +59,7 @@ static int      skip;
 static char     *srcbuf;            // Work buffer to store all input data
 static long     *usec = NULL;       // elapsed time
 static bool     print_out = FALSE;
+static bool     carriage_return = FALSE;
 
 // You can edit this function for other data structure.
 int     length_compare;
@@ -74,12 +75,16 @@ static int cmpstring(const void *p1, const void *p2)    // Function to compare
 
 static  void dump_buffer(void *array, size_t nmemb, size_t size) {
     size_t  i;
-    char *p;
-    for (p = array, i = 0; i++ < nmemb;) {
-        for (int j = 0; j++ < size;)
-            fputc(*p++, OUT);
-        fprintf(OUT, "\n"); // New line
+    char *p, *p1, *p2;
+    for (p = array, i = 0; i++ < nmemb; p += size) {
+        for (p1 = p + size; p < p1--;) {    // skip trailing CR, LF, and '\0'
+            if ((*p1 != CR) && (*p1 != LF) && (*p1 != '\0')) break;
+        }
+        for (p2 = p; p2 <= p1;) fputc(*p2++, OUT);
+        if (carriage_return) fputc(CR, OUT);
+        fputc(LF, OUT);
     }
+    fflush(OUT);
 }
 
 typedef enum {
@@ -161,6 +166,7 @@ RETRY:   ;
                     break;
                 }
 #endif
+            break;
         }
         else    rtn = workbuff;
     }
@@ -222,16 +228,14 @@ int main(int argc, char *argv[])
 
 #define SENTINEL    1000
    INFO *info, large_functions[] = {  // reordered by SORT_TYPE
-            {'3', SWAP_MED3, "qsort_med3()", qsort_med3, "quicksort : pivot is the median of 3 elements with sWaps."},
+            {'3', SWAP_MED3, "qsort_med3()", qsort_med3, "quicksort : pivot is the median of 3 elements using sWaps."},
             {'a', QSORT_ASYMM, "quick_asymm()", quick_asymm, "quicksort : simple Asymmetric quicksort."},
-            {'d', SWAP_MIDDLE, "qsort_middle()", qsort_middle, "quicksort : pivot is the miDDle element with swaps."},
-            {'f', SWAP_FIRST, "qsort_first()", qsort_first, "quicksort : pivot is the First element with swaps."},
-            {'h', QSORT_HOLE, "quick_hole()", quick_hole, "quicksort : prototype with Hole."},
+            {'d', SWAP_MIDDLE, "qsort_middle()", qsort_middle, "quicksort : pivot is the miDDle element using swaps."},
+            {'f', SWAP_FIRST, "qsort_first()", qsort_first, "quicksort : pivot is the First element using swaps."},
+            {'h', QSORT_HOLE, "quick_hole()", quick_hole, "quicksort : prototype using a pivot Hole."},
             {'j', SWAP_DUAL, "dual_pivot()", dual_pivot, "quicksort : implemented dualpivot quicksort in Java."},
-            {'k', TICKET_SORT, "ticket_sort()", ticket_sort, "quicksort : ticKet sort (extended tag sort)."},
-#ifdef  DEBUG
-            {'K', SWAP_KR, "qsort_kr()", qsort_kr, "quicksort : pivot is the middle element with swaps in K&R style."},
-#endif
+            {'K', SWAP_KR, "qsort_kr()", qsort_kr, "quicksort : pivot is the middle element in K&R style."},
+            {'k', TICKET_SORT, "ticket_sort()", ticket_sort, "quicksort : ticKet sort using quicksort."},
             {'m', MERGE_ARRAY, "merge_array()", merge_array, "mergesort : conventional top-down Mergeosrt."},
             {'q', QUICK_SORT, "asymm_qsort()", asymm_qsort, "quicksort : final asymmetric QuickSort."},
             {'r', QSORT_RANDOM, "quick_random()", quick_random, "quicksort : choose a Random element as a pivot."},
@@ -452,21 +456,28 @@ int main(int argc, char *argv[])
     // Read the first line to get a record size
     char read_buff[1024];
     if (! fgets(read_buff, sizeof(read_buff) - 1, fp)) return EXIT_SUCCESS; // EOF
-    if ((p = memchr(read_buff, CR, sizeof(read_buff)))) *p = LF;	// change the first CR to LF for the Microsoft OS.
+    if (! isprint((int)read_buff[0])) {     // not a printable character
+        fprintf(ERR, "Use printable characters.\n");
+        return EXIT_FAILURE;
+    }
     p = memchr(read_buff, LF, sizeof(read_buff));   // fgets(3) stores EOL.
-    assert(p != NULL);
-//    if (*(p - 1) == CR) p--;
-    int data_len = p - read_buff;   // length of data before LF
+    assert(p != NULL);  // Don't replace the LF to '\0'.
+    size_t data_len;    // length of data before LF
+    if ((data_len = p - read_buff) && (*--p == CR)) {   // CR + LF at the EOL.
+        carriage_return = TRUE; // for Microsoft OS.
+        data_len--;
+    }
     if (data_len == 0) {
         fprintf(ERR, "The first line is empty.\n");
         return EXIT_FAILURE;
     } else if (size == 0) { // -Z is undefined.
         size = data_len;
     } else if (data_len > size) {
-        fprintf(ERR, "The first line is too long! Use -Z option.\n");
+        fprintf(ERR, "The first line is too long! Use the -Z option.\n");
         return EXIT_FAILURE;
     }
-    length_compare = strlen(read_buff); // length of the first string to omit strings after '\0'.
+    i = 0;
+    length_compare = strlen(read_buff); // to omit after '\0'.
 #ifdef DEBUG
     if (trace_level >= TRACE_DUMP) fprintf(OUT, "Size of an element = %s\n", dump_size_t(NULL, size));
 #endif
@@ -482,16 +493,17 @@ int main(int argc, char *argv[])
     char *src = srcbuf;
     i = 1;
     do {    // read_buff is terminated with null character '\0'.
-        size_t l = data_len;
+        size_t l;
         p = memchr(read_buff, LF, sizeof(read_buff));
-        if (p != NULL && (l = read_buff - p) > data_len) l = data_len;
+        if ((l = read_buff - p) > data_len) l = data_len;
         memcpy(src, read_buff, l);      // don't use strncpy(3).
-        src[l] = '\0';
         src += size;
         if (! fgets(read_buff, sizeof(read_buff), fp)) break;       // EOF
     } while (i++ < nmemb);
-    if (i <= 1) return EXIT_SUCCESS;    // only one line
-    memsize = (nmemb = i) * size;
+    if (fin) fclose(fp);
+    if (i < 1) return EXIT_SUCCESS;     // Output no line if the input is Only one line.
+    else if (i < nmemb) nmemb = i + 1;
+    memsize = nmemb * size;
     assert(memsize != 0);
     srcbuf = realloc(srcbuf, memsize);  // reduce the size
 //    dump_buffer(srcbuf, nmemb, size);
