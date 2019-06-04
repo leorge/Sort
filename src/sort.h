@@ -40,7 +40,6 @@ typedef int (*__compar_d_fn_t) (const void *, const void *, void *);
 
 /***** variables *****/
 
-extern size_t       INS;                // main.c
 extern size_t       medium_boundary;    // main.c
 extern size_t       small_boundary;     // main.c
 extern size_t       middle1, random1, median3, median5, medianL;   // main.c
