@@ -88,6 +88,7 @@ static  void dump_buffer(void *array, size_t nmemb, size_t size) {
 }
 
 typedef enum {
+    DUMMY_SORT,
     DEBUG_SORT,
     SWAP_FIRST,
     SWAP_MIDDLE,
@@ -104,7 +105,6 @@ typedef enum {
     TICKET_SORT,
     MERGE_INDIRECT,
     MERGE_ARRAY,
-    DUMMY_SORT		// The last enumeration
 } SORT_TYPE;
 
 typedef struct {
