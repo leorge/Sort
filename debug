@@ -2,10 +2,12 @@
 #
 # Usage:
 #
-#   N=nnn; random.awk $N | [dir=Debug] ./$0 [-N $N] [-Z 999] ...
+#   N=nnn; random.awk $N | [dir=Debug] ./$0 [-N $N] ...
 #
-${dir:=Release}/Sort -UfdK3wjhSarqkm \
-    -t -P 31,63,127,255,1023,4095 \
-    -I qm -B 8191 \
+#     ex) N=234567; random.awk $N | ./$0 -N $N -Z 1000
+#
+${dir:=Release}/Sort -fdK3wjhSartqkm -I qm \
+    -P 31,63,127,255,1023,4095 \
+    -B 8191 \
     -R 1 \
-    $*	# You can add parameters
+    $*	# You can overwrite and add parameters such as "-U".
