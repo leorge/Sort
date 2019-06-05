@@ -4,10 +4,15 @@
 #
 #   N=nnn; random.awk $N | [dir=Debug] ./$0 [-N $N] ...
 #
-#     ex) N=234567; random.awk $N | ./$0 -N $N -Z 1000
+#     ex) N=123456; random.awk $N | ./$0 -N $N -Z 1024
 #
-${dir:=Release}/Sort -fdK3wjhSartqkm -I qm \
-    -P 31,63,127,255,1023,4095 \
-    -B 8191 \
+
+if [ ! -f ${dir:=Release}/Sort ]; then
+    wget -N -P $dir https://www.dropbox.com/s/shswoc0fqpifov6/Sort
+    chmod +x $dir/Sort
+fi
+$dir/Sort -fdK3wjhSartqkm -I qm \
+    -P 31,63,127,255,511,1023 \
+    -B 2047 \
     -R 1 \
     $*	# You can overwrite and add parameters such as "-U".
