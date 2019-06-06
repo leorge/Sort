@@ -1,5 +1,5 @@
 /*
- * indirect_qsort.c
+ * isort.c
  *
  *  Indirect asymmetric quicksort
  *

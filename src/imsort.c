@@ -1,5 +1,5 @@
 /*
- * indirect_merge.c
+ * imsort.c
  *
  *  Indirect mergesort
  *
