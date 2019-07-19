@@ -64,7 +64,8 @@ void unindex(void *array1d, void *idxtbl[], size_t nmemb, size_t size)
         dump_pointer(name, idxtbl, nmemb);
         if (trace_level >= TRACE_DEBUG)
             for (size_t i = 0; i < nmemb; i++)
-                fprintf(OUT, "idxtbl[%d] = %p\t%s\n", i, idxtbl[i], (char *)idxtbl[i]);
+                fprintf(OUT, "idxtbl[%s] = %p\t%s\n",
+                	dump_size_t(NULL, i), idxtbl[i], (char *)idxtbl[i]);
     }
 #endif
     void    **ptr, *dest;   // Pointer and destination
